@@ -26,10 +26,11 @@ class Product(Entity):
     width = models.FloatField('width', null=True, blank=True)
     height = models.FloatField('height', null=True, blank=True)
     length = models.FloatField('length', null=True, blank=True)
-    qty = models.DecimalField('qty', max_digits=10, decimal_places=2)
+    qty = models.DecimalField('qty', max_digits=10, decimal_places=2, default=1)
     cost = models.DecimalField('cost', max_digits=10, decimal_places=2)
     price = models.DecimalField('price', max_digits=10, decimal_places=2)
     discounted_price = models.DecimalField('discounted price', max_digits=10, decimal_places=2)
+    image = models.ImageField('image', upload_to='product/')
     category = models.ForeignKey('commerce.Category', verbose_name='category', related_name='products',
                                  null=True,
                                  blank=True,
@@ -166,6 +167,29 @@ class City(Entity):
         return self.name
 
 
+class Image(Entity):
+    product = models.ForeignKey(Product, verbose_name='product', related_name='images',
+                                on_delete=models.CASCADE)
+    image = models.ImageField('image', upload_to='product/')
+
+    def __str__(self):
+        return self.product.name
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        img = Image.open(self.image.path)
+
+        if img.height > 500 or img.width > 500:
+            output_size = (500, 500)
+            img.thumbnail(output_size)
+            img.save(self.image.path)
+
+    class Meta:
+        verbose_name = 'image'
+        verbose_name_plural = 'images'
+
+
 class Comment(Entity):
     user = models.ForeignKey(User, verbose_name='user', related_name='comments', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, verbose_name='product', related_name='comments', on_delete=models.CASCADE)
@@ -173,5 +197,3 @@ class Comment(Entity):
 
     def __str__(self):
         return self.comment
-
-
