@@ -1,7 +1,6 @@
 import uuid
 from PIL import Image
 from ckeditor.fields import RichTextField
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.contrib.auth import get_user_model
 from mptt.fields import TreeForeignKey
@@ -19,6 +18,30 @@ class Entity(models.Model):
     updated = models.DateTimeField(editable=False, auto_now=True)
 
 
+class Profile(Entity):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=50, blank=True)
+    last_name = models.CharField(max_length=50, blank=True)
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
+    address1 = models.CharField(max_length=255, null=True, blank=True)
+    address2 = models.CharField(max_length=255, null=True, blank=True)
+    work_address = models.CharField(max_length=255, null=True, blank=True)
+    image = models.ImageField(default='default.jpg', upload_to='profile_pics')
+
+    def __str__(self):
+        return f'{self.user.first_name}  {self.user.last_name} Profile'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        img = Image.open(self.image.path)
+
+        if img.height > 300 or img.width > 300:
+            output_size = (300, 300)
+            img.thumbnail(output_size)
+            img.save(self.image.path)
+
+
 class Product(Entity):
     name = models.CharField('name', max_length=255)
     description = RichTextField('description', null=True, blank=True)
@@ -27,7 +50,6 @@ class Product(Entity):
     height = models.FloatField('height', null=True, blank=True)
     length = models.FloatField('length', null=True, blank=True)
     qty = models.DecimalField('qty', max_digits=10, decimal_places=2, default=1)
-    cost = models.DecimalField('cost', max_digits=10, decimal_places=2)
     price = models.DecimalField('price', max_digits=10, decimal_places=2)
     discounted_price = models.DecimalField('discounted price', max_digits=10, decimal_places=2)
     image = models.ImageField('image', upload_to='product/')
@@ -38,11 +60,17 @@ class Product(Entity):
 
     is_featured = models.BooleanField('is featured')
     is_active = models.BooleanField('is active')
-    label = models.ForeignKey('commerce.Label', verbose_name='label', related_name='products', null=True, blank=True,
-                              on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return self.user.first_name
+
+    # @property
+    # def in_stock(self):
+    #     return self.qty > 0
+    #
+    # @property
+    # def images(self):
+    #     return self.images.all()
 
 
 class Category(MPTTModel, Entity):
@@ -50,51 +78,38 @@ class Category(MPTTModel, Entity):
                             null=True, blank=True, on_delete=models.CASCADE)
     name = models.CharField('name', max_length=255)
     description = models.TextField('description')
-    image = models.ImageField('image', upload_to='category/')
+    image = models.ImageField("image", upload_to='category/')
     is_active = models.BooleanField('is active')
 
     created = models.DateField(editable=False, auto_now_add=True)
     updated = models.DateTimeField(editable=False, auto_now=True)
 
-    def __str__(self):
-        return self.name
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
-        img = Image.open(self.image.path)
-
-        if img.height > 500 or img.width > 500:
-            output_size = (500, 500)
-            img.thumbnail(output_size)
-            img.save(self.image.path)
-
     class MPTTMeta:
-        order_insertion_by = ['name']
+        order_inspired_by = ['parent']
+
+    # class MPTTMeta:
+    #     order_insertion_by = ['name']
 
     class Meta:
         verbose_name = 'category'
         verbose_name_plural = 'categories'
 
-
-class Address(Entity):
-    user = models.ForeignKey(User, verbose_name='user', related_name='addresses',
-                             on_delete=models.CASCADE)
-    address = models.CharField('address 1', max_length=255)
-
-    city = models.ForeignKey('City', related_name='addresses', on_delete=models.CASCADE)
-    phone = models.CharField('phone', max_length=255)
-
     def __str__(self):
-        return f'{self.user.first_name} - {self.address} - {self.phone}'
+        if self.parent:
+            return f'-   {self.name}'
+        return f'{self.name}'
+
+    @property
+    def children(self):
+        return self.get_children()
 
 
 class Order(Entity):
     user = models.ForeignKey(User, verbose_name='user', related_name='orders', null=True, blank=True,
                              on_delete=models.CASCADE)
-    address = models.ForeignKey(Address, verbose_name='address', null=True, blank=True,
+    address = models.ForeignKey('Address', verbose_name='address', null=True, blank=True,
                                 on_delete=models.CASCADE)
-    total = models.DecimalField('total', blank=True, null=True, max_digits=1000, decimal_places=0)
+    # total = models.DecimalField('total', blank=True, null=True, max_digits=1000, decimal_places=0)
     status = models.ForeignKey('commerce.OrderStatus', verbose_name='status', related_name='orders',
                                on_delete=models.CASCADE)
     note = models.CharField('note', null=True, blank=True, max_length=255)
@@ -131,17 +146,16 @@ class Item(Entity):
 
 class OrderStatus(Entity):
     NEW = 'NEW'  # Order with reference created, items are in the basket.
-    PROCESSING = 'PROCESSING'  # Payment confirmed, processing order.
+    # PROCESSING = 'PROCESSING'  # Payment confirmed, processing order.
     SHIPPED = 'SHIPPED'  # Shipped to customer.
     COMPLETED = 'COMPLETED'  # Completed and received by customer.
-    REFUNDED = 'REFUNDED'  # Fully refunded by seller.
+    # REFUNDED = 'REFUNDED'  # Fully refunded by seller.
 
     title = models.CharField('title', max_length=255, choices=[
         (NEW, NEW),
-        (PROCESSING, PROCESSING),
         (SHIPPED, SHIPPED),
         (COMPLETED, COMPLETED),
-        (REFUNDED, REFUNDED),
+
     ])
     is_default = models.BooleanField('is default')
 
@@ -149,45 +163,55 @@ class OrderStatus(Entity):
         return self.title
 
 
-class Label(Entity):
-    name = models.CharField('name', max_length=255)
-
-    class Meta:
-        verbose_name = 'label'
-        verbose_name_plural = 'labels'
-
-    def __str__(self):
-        return self.name
-
-
-class City(Entity):
-    name = models.CharField('city', max_length=255)
-
-    def __str__(self):
-        return self.name
-
-
-class Image(Entity):
-    product = models.ForeignKey(Product, verbose_name='product', related_name='images',
-                                on_delete=models.CASCADE)
-    image = models.ImageField('image', upload_to='product/')
+class Images(Entity):
+    product = models.ForeignKey(Product, verbose_name='product', related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField("image", upload_to='product/')
+    is_default_image = models.BooleanField('is default image')
 
     def __str__(self):
         return self.product.name
 
-    def save(self, *args, **kwargs):
+    class Meta:
+        verbose_name = 'image'
+        verbose_name_plural = 'images'
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None, *args, **kwargs):
         super().save(*args, **kwargs)
 
         img = Image.open(self.image.path)
-
         if img.height > 500 or img.width > 500:
             output_size = (500, 500)
             img.thumbnail(output_size)
             img.save(self.image.path)
 
-    class Meta:
-        verbose_name = 'image'
-        verbose_name_plural = 'images'
+
+class Address(Entity):
+    user = models.ForeignKey(User, verbose_name='user', related_name='addresses',
+                             on_delete=models.CASCADE)
+    work_address = models.BooleanField('work address', null=True, blank=True)
+    address1 = models.CharField('address1', max_length=255)
+    address2 = models.CharField('address2', null=True, blank=True, max_length=255)
+    city = models.ForeignKey('City', related_name='addresses', on_delete=models.CASCADE)
+    phone = models.CharField('phone', max_length=255)
+
+    def __str__(self):
+        return f'{self.user.first_name} - {self.address1} - {self.address2} - {self.phone}'
+
+
+class City(Entity):
+    name = models.CharField('city', max_length=255)
+    town = models.CharField('town', max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
+class Town(Entity):
+    name = models.CharField('town', max_length=255)
+
+    def __str__(self):
+        return self.name
 
 
 class Comment(Entity):
@@ -197,3 +221,13 @@ class Comment(Entity):
 
     def __str__(self):
         return self.comment
+
+# class Label(Entity):
+#     name = models.CharField('name', max_length=255)
+#
+#     class Meta:
+#         verbose_name = 'label'
+#         verbose_name_plural = 'labels'
+#
+#     def __str__(self):
+#         return self.name
