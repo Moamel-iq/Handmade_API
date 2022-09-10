@@ -6,6 +6,8 @@ from django.contrib.auth import get_user_model
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 
+import commerce
+
 User = get_user_model()
 
 
@@ -43,16 +45,17 @@ class Profile(Entity):
 
 
 class Product(Entity):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField('name', max_length=255)
-    description = RichTextField('description', null=True, blank=True)
-    weight = models.FloatField('weight', null=True, blank=True)
-    width = models.FloatField('width', null=True, blank=True)
-    height = models.FloatField('height', null=True, blank=True)
-    length = models.FloatField('length', null=True, blank=True)
+    # description = RichTextField('description', null=True, blank=True)
+    # weight = models.FloatField('weight', null=True, blank=True)
+    # width = models.FloatField('width', null=True, blank=True)
+    # height = models.FloatField('height', null=True, blank=True)
+    # length = models.FloatField('length', null=True, blank=True)
     qty = models.DecimalField('qty', max_digits=10, decimal_places=2, default=1)
     price = models.DecimalField('price', max_digits=10, decimal_places=2)
-    discounted_price = models.DecimalField('discounted price', max_digits=10, decimal_places=2)
-    image = models.ImageField('image', upload_to='product/')
+    # discounted_price = models.DecimalField('discounted price', max_digits=10, decimal_places=2)
+    image = models.ManyToManyField('commerce.Images', blank=True, related_name='product')
     category = models.ForeignKey('commerce.Category', verbose_name='category', related_name='products',
                                  null=True,
                                  blank=True,
@@ -64,21 +67,21 @@ class Product(Entity):
     def __str__(self):
         return self.user.first_name
 
-    # @property
-    # def in_stock(self):
-    #     return self.qty > 0
-    #
-    # @property
-    # def images(self):
-    #     return self.images.all()
+    @property
+    def in_stock(self):
+        return self.qty > 0
+
+    @property
+    def images(self):
+        return self.images.all()
 
 
 class Category(MPTTModel, Entity):
     parent = TreeForeignKey('self', verbose_name='parent', related_name='children',
                             null=True, blank=True, on_delete=models.CASCADE)
     name = models.CharField('name', max_length=255)
-    description = models.TextField('description')
-    image = models.ImageField("image", upload_to='category/')
+    description = models.TextField('description', null=True, blank=True)
+    image = models.ImageField("image", upload_to='category/', null=True, blank=True)
     is_active = models.BooleanField('is active')
 
     created = models.DateField(editable=False, auto_now_add=True)
@@ -118,12 +121,12 @@ class Order(Entity):
     items = models.ManyToManyField('commerce.Item', verbose_name='items', related_name='order')
 
     def __str__(self):
-        return f'{self.user.first_name} + {self.total}'
+        return f'{self.user.first_name}  {self.order_total}'
 
     @property
     def order_total(self):
         order_total = sum(
-            i.product.price_discounted * i.item_qty for i in self.items.all()
+            i.item_qty for i in self.items.all()
         )
 
         return order_total
@@ -141,7 +144,7 @@ class Item(Entity):
     ordered = models.BooleanField('ordered')
 
     def __str__(self):
-        return f''
+        return f'{self.product.name} + {self.item_qty}'
 
 
 class OrderStatus(Entity):
@@ -164,12 +167,13 @@ class OrderStatus(Entity):
 
 
 class Images(Entity):
-    product = models.ForeignKey(Product, verbose_name='product', related_name='images', on_delete=models.CASCADE)
     image = models.ImageField("image", upload_to='product/')
     is_default_image = models.BooleanField('is default image')
+    # product = models.ForeignKey('commerce.Product',
+    #                             on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.product.name
+        return 'self.product.name'
 
     class Meta:
         verbose_name = 'image'
