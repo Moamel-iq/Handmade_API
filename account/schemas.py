@@ -3,7 +3,7 @@ from ninja import Schema
 from pydantic import EmailStr, Field
 
 
-class Account(Schema):
+class AccountData(Schema):
     email: EmailStr
     password: str
     first_name: str
@@ -13,7 +13,7 @@ class Account(Schema):
     is_verified: bool
 
 
-class AccountSignup(Schema):
+class AccountSignupData(Schema):
     first_name: str
     last_name: str
     email: EmailStr
@@ -22,24 +22,18 @@ class AccountSignup(Schema):
     phone_number: int
 
 
-class AccountLogin(Schema):
+class AccountLoginData(Schema):
     email: EmailStr
     password: str
-
-
-class AccountUpdate(Schema):
-    first_name: str
-    last_name: str
-    email: EmailStr
-    phone_number: int
-    address: str
-    is_verified: bool
 
 
 class ChangePassword(Schema):
     old_password: str
     new_password: str
     confirm_password: str
+
+
+
 
 
 

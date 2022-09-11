@@ -1,10 +1,8 @@
 import uuid
 from PIL import Image
-from ckeditor.fields import RichTextField
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.db.models import TextField
-from django.utils.safestring import mark_safe
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 from colorfield.fields import ColorField
@@ -48,10 +46,9 @@ class Profile(Entity):
 class Product(Entity):
     name = models.CharField('name', max_length=255)
     description = TextField('description', null=True, blank=True)
-    qty = models.DecimalField('qty', max_digits=10, decimal_places=2, default=1)
+    qty = models.IntegerField('qty', default=1)
     price = models.DecimalField('price', max_digits=10, decimal_places=2)
     discounted_price = models.FloatField('discounted price', null=True, blank=True)
-    # color = models.ManyToManyField('commerce.ColorProduct', blank=True, related_name='product')
     category = models.ForeignKey('commerce.Category', verbose_name='category', related_name='products', null=True,
                                  blank=True, on_delete=models.SET_NULL)
 
@@ -74,6 +71,21 @@ class ColorProduct(Entity):
     COLOR_PALETTE = [
         ("#FFFFFF", "white",),
         ("#000000", "black",),
+        ("#FF0000", "red",),
+        ("#00FF00", "green",),
+        ("#0000FF", "blue",),
+        ("#FFFF00", "yellow",),
+        ("#FF00FF", "magenta",),
+        ("#00FFFF", "cyan",),
+        ("#C0C0C0", "silver",),
+        ("#808080", "gray",),
+        ("#800000", "maroon",),
+        ("#808000", "olive",),
+        ("#008000", "green",),
+        ("#800080", "purple",),
+        ("#008080", "teal",),
+        ("#000080", "navy",),
+
     ]
     choices_color = ColorField(choices=COLOR_PALETTE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='color')
@@ -148,7 +160,7 @@ class Item(Entity):
     ordered = models.BooleanField('ordered')
 
     def __str__(self):
-        return f'{self.product.name} + {self.item_qty}'
+        return f'{self.product.name}  {self.item_qty}'
 
 
 class OrderStatus(Entity):
@@ -176,7 +188,7 @@ class Images(Entity):
     product = models.ForeignKey(Product, verbose_name='product', related_name='images', on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.image.name
+        return f'{self.product.name} image'
 
     class Meta:
         verbose_name = 'image'
@@ -196,29 +208,11 @@ class Images(Entity):
 class Address(Entity):
     user = models.ForeignKey(User, verbose_name='user', related_name='addresses',
                              on_delete=models.CASCADE)
-    work_address = models.BooleanField('work address', null=True, blank=True)
-    address1 = models.CharField('address1', max_length=255)
-    address2 = models.CharField('address2', null=True, blank=True, max_length=255)
-    city = models.ForeignKey('City', related_name='addresses', on_delete=models.CASCADE)
+    address = models.CharField('address1', max_length=255)
     phone = models.CharField('phone', max_length=255)
 
     def __str__(self):
-        return f'{self.user.first_name} - {self.address1} - {self.address2} - {self.phone}'
-
-
-class City(Entity):
-    name = models.CharField('city', max_length=255)
-    town = models.CharField('town', max_length=255)
-
-    def __str__(self):
-        return self.name
-
-
-class Town(Entity):
-    name = models.CharField('town', max_length=255)
-
-    def __str__(self):
-        return self.name
+        return f'{self.user.first_name} - {self.address} - {self.phone}'
 
 
 class Comment(Entity):
@@ -227,7 +221,7 @@ class Comment(Entity):
     comment = models.TextField('comment')
 
     def __str__(self):
-        return self.comment
+        return f'{self.user.first_name} - {self.product.name} comment'
 
 
 class Wishlist(Entity):
@@ -240,3 +234,17 @@ class Wishlist(Entity):
     class Meta:
         verbose_name = 'wishlist'
         verbose_name_plural = 'wishlists'
+
+# class City(Entity):
+#     name = models.CharField('city', max_length=255)
+#     town = models.CharField('town', max_length=255)
+#
+#     def __str__(self):
+#         return self.name
+#
+#
+# class Town(Entity):
+#     name = models.CharField('town', max_length=255)
+#
+#     def __str__(self):
+#         return self.name

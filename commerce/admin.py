@@ -1,15 +1,11 @@
 from django.contrib import admin
+
 from nested_inline.admin import NestedModelAdmin
 from commerce.models import *
-from easy_select2 import select2_modelform
 
-# admin.site.register(Product)
-admin.site.register(Category)
-admin.site.register(Order)
 admin.site.register(Item)
+admin.site.register(Category)
 admin.site.register(OrderStatus)
-# admin.site.register(City)
-# admin.site.register(Address)
 admin.site.register(Profile)
 admin.site.register(Images)
 admin.site.register(Comment)
@@ -20,7 +16,7 @@ admin.site.register(Wishlist)
 class ProductImage(admin.TabularInline):
     model = Images
     inlines = []
-    extra = 9
+    extra = 1
 
 
 class ProductColor(admin.TabularInline):
@@ -33,7 +29,22 @@ class ProductColor(admin.TabularInline):
 class ProductAdmin(NestedModelAdmin):
     inlines = [ProductColor, ProductImage]
 
-    list_display = ['name', 'price', 'category', 'is_active']
+    list_display = ['name', 'price', 'category', 'is_active', 'qty']
     list_filter = ['is_active', 'category']
     search_fields = ['name', 'price', 'category']
     list_per_page = 20
+
+
+class ItemInline(admin.TabularInline):
+    model = Order.items.through
+    inlines = []
+    extra = 1
+
+
+@admin.register(Order)
+class OrderAdmin(NestedModelAdmin):
+    inlines = [ItemInline]
+    list_display = ['user', 'status', 'order_total']
+    list_per_page = 20
+
+
