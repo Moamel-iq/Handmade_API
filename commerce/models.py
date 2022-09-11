@@ -3,10 +3,11 @@ from PIL import Image
 from ckeditor.fields import RichTextField
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.db.models import TextField
+from django.utils.safestring import mark_safe
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
-
-import commerce
+from colorfield.fields import ColorField
 
 User = get_user_model()
 
@@ -45,27 +46,20 @@ class Profile(Entity):
 
 
 class Product(Entity):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField('name', max_length=255)
-    # description = RichTextField('description', null=True, blank=True)
-    # weight = models.FloatField('weight', null=True, blank=True)
-    # width = models.FloatField('width', null=True, blank=True)
-    # height = models.FloatField('height', null=True, blank=True)
-    # length = models.FloatField('length', null=True, blank=True)
+    description = TextField('description', null=True, blank=True)
     qty = models.DecimalField('qty', max_digits=10, decimal_places=2, default=1)
     price = models.DecimalField('price', max_digits=10, decimal_places=2)
-    # discounted_price = models.DecimalField('discounted price', max_digits=10, decimal_places=2)
-    image = models.ManyToManyField('commerce.Images', blank=True, related_name='product')
-    category = models.ForeignKey('commerce.Category', verbose_name='category', related_name='products',
-                                 null=True,
-                                 blank=True,
-                                 on_delete=models.SET_NULL)
+    discounted_price = models.FloatField('discounted price', null=True, blank=True)
+    # color = models.ManyToManyField('commerce.ColorProduct', blank=True, related_name='product')
+    category = models.ForeignKey('commerce.Category', verbose_name='category', related_name='products', null=True,
+                                 blank=True, on_delete=models.SET_NULL)
 
     is_featured = models.BooleanField('is featured')
     is_active = models.BooleanField('is active')
 
     def __str__(self):
-        return self.user.first_name
+        return self.name
 
     @property
     def in_stock(self):
@@ -74,6 +68,18 @@ class Product(Entity):
     @property
     def images(self):
         return self.images.all()
+
+
+class ColorProduct(Entity):
+    COLOR_PALETTE = [
+        ("#FFFFFF", "white",),
+        ("#000000", "black",),
+    ]
+    choices_color = ColorField(choices=COLOR_PALETTE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='color')
+
+    def __str__(self):
+        return f'{self.product.name}   {self.choices_color}'
 
 
 class Category(MPTTModel, Entity):
@@ -99,7 +105,7 @@ class Category(MPTTModel, Entity):
 
     def __str__(self):
         if self.parent:
-            return f'-   {self.name}'
+            return f' {self.parent} - {self.name}'
         return f'{self.name}'
 
     @property
@@ -112,24 +118,22 @@ class Order(Entity):
                              on_delete=models.CASCADE)
     address = models.ForeignKey('Address', verbose_name='address', null=True, blank=True,
                                 on_delete=models.CASCADE)
-    # total = models.DecimalField('total', blank=True, null=True, max_digits=1000, decimal_places=0)
     status = models.ForeignKey('commerce.OrderStatus', verbose_name='status', related_name='orders',
                                on_delete=models.CASCADE)
     note = models.CharField('note', null=True, blank=True, max_length=255)
-    ref_code = models.CharField('ref code', max_length=255)
+    ref_code = models.CharField('ref code', max_length=255, null=True, blank=True)
     ordered = models.BooleanField('ordered')
     items = models.ManyToManyField('commerce.Item', verbose_name='items', related_name='order')
-
-    def __str__(self):
-        return f'{self.user.first_name}  {self.order_total}'
 
     @property
     def order_total(self):
         order_total = sum(
-            i.item_qty for i in self.items.all()
+            i.product.price * i.item_qty for i in self.items.all()
         )
-
         return order_total
+
+    def __str__(self):
+        return f'{self.user.first_name} {self.user.last_name} total={self.order_total} '
 
 
 class Item(Entity):
@@ -167,13 +171,12 @@ class OrderStatus(Entity):
 
 
 class Images(Entity):
-    image = models.ImageField("image", upload_to='product/')
+    image = models.ImageField('image', upload_to='product/')
     is_default_image = models.BooleanField('is default image')
-    # product = models.ForeignKey('commerce.Product',
-    #                             on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, verbose_name='product', related_name='images', on_delete=models.CASCADE)
 
     def __str__(self):
-        return 'self.product.name'
+        return self.image.name
 
     class Meta:
         verbose_name = 'image'
@@ -226,12 +229,14 @@ class Comment(Entity):
     def __str__(self):
         return self.comment
 
-# class Label(Entity):
-#     name = models.CharField('name', max_length=255)
-#
-#     class Meta:
-#         verbose_name = 'label'
-#         verbose_name_plural = 'labels'
-#
-#     def __str__(self):
-#         return self.name
+
+class Wishlist(Entity):
+    user = models.ForeignKey(User, verbose_name='user', related_name='wishlists', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, verbose_name='product', related_name='wishlists', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.product.name
+
+    class Meta:
+        verbose_name = 'wishlist'
+        verbose_name_plural = 'wishlists'

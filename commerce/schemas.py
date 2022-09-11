@@ -1,10 +1,11 @@
 from typing import List
 from ninja import Schema
-from pydantic import UUID5
+from pydantic import UUID4
 from account.schemas import Account
 
 
 class Profile(Schema):
+    id: UUID4
     account: Account
     first_name: str
     last_name: str
@@ -15,7 +16,7 @@ class Profile(Schema):
 
 
 class Category(Schema):
-    id: UUID5
+    id: UUID4
     name: str
     description: str
     image: str
@@ -27,18 +28,18 @@ Category.update_forward_refs()
 
 
 class ImageCreate(Schema):
-    product_id: UUID5
+    product_id: UUID4
     is_default_image: bool
     image: str
 
 
 class ProductImageOut(Schema, ImageCreate):
-    id: UUID5
+    id: UUID4
     image: str
 
 
 class Product(Schema):
-    id: UUID5
+    id: UUID4
     name: str
     price: int
     discounted_price: int
@@ -55,6 +56,7 @@ class Product(Schema):
 
 
 class Order(Schema):
+    id: UUID4
     order_id: str
     total: float
     status: str
@@ -63,18 +65,11 @@ class Order(Schema):
     updated_at: str
 
 
-class Comment(Schema):
-    id: UUID5
-    product_id: UUID5
-    user_id: UUID5
+class CommentData(Schema):
+    id: UUID4
+    product_id: UUID4
+    user_id: UUID4
     comment: str
     created_at: str
     updated_at: str
     user: Account
-
-
-
-# class Label(Schema):
-#     name: str
-#     description: str
-#     is_active: bool
