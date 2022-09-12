@@ -1,10 +1,11 @@
 from django.contrib import admin
+from mptt.admin import DraggableMPTTAdmin
 
 from nested_inline.admin import NestedModelAdmin
 from commerce.models import *
 
 admin.site.register(Item)
-admin.site.register(Category)
+# admin.site.register(Category)
 admin.site.register(OrderStatus)
 admin.site.register(Profile)
 admin.site.register(Images)
@@ -48,3 +49,7 @@ class OrderAdmin(NestedModelAdmin):
     list_per_page = 20
 
 
+@admin.register(Category)
+class CategoryAdmin(DraggableMPTTAdmin):
+    list_display = ['indented_title', 'parent', 'name',  'image', 'is_active']
+    list_per_page = 20
