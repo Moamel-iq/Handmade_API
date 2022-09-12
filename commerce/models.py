@@ -24,9 +24,7 @@ class Profile(Entity):
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50, blank=True)
     phone_number = models.CharField(max_length=15, null=True, blank=True)
-    address1 = models.CharField(max_length=255, null=True, blank=True)
-    address2 = models.CharField(max_length=255, null=True, blank=True)
-    work_address = models.CharField(max_length=255, null=True, blank=True)
+    address = models.CharField(max_length=255)
     image = models.ImageField(default='default.jpg', upload_to='profile_pics')
 
     def __str__(self):
@@ -87,11 +85,11 @@ class ColorProduct(Entity):
         ("#000080", "navy",),
 
     ]
-    choices_color = ColorField(choices=COLOR_PALETTE)
+    color = ColorField(choices=COLOR_PALETTE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='color')
 
     def __str__(self):
-        return f'{self.product.name}   {self.choices_color}'
+        return f'{self.product.name}   {self.color}'
 
 
 class Category(MPTTModel, Entity):

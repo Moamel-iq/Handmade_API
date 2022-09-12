@@ -1,12 +1,12 @@
 from typing import List
 from ninja import Schema
 from pydantic import UUID4
-from account.schemas import Account
+from account.schemas import AccountData
 
 
 class Profile(Schema):
     id: UUID4
-    account: Account
+    account: AccountData
     first_name: str
     last_name: str
     phone_number: str
@@ -72,4 +72,4 @@ class CommentData(Schema):
     comment: str
     created_at: str
     updated_at: str
-    user: Account
+    user: AccountData

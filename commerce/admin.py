@@ -7,11 +7,15 @@ from commerce.models import *
 admin.site.register(Item)
 # admin.site.register(Category)
 admin.site.register(OrderStatus)
-admin.site.register(Profile)
+# admin.site.register(Profile)
 admin.site.register(Images)
-admin.site.register(Comment)
-admin.site.register(ColorProduct)
-admin.site.register(Wishlist)
+# admin.site.register(Comment)
+
+
+# admin.site.register(ColorProduct)
+
+
+# admin.site.register(Wishlist)
 
 
 class ProductImage(admin.TabularInline):
@@ -32,7 +36,7 @@ class ProductAdmin(NestedModelAdmin):
 
     list_display = ['name', 'price', 'category', 'is_active', 'qty']
     list_filter = ['is_active', 'category']
-    search_fields = ['name', 'price', 'category']
+    search_fields = ['name']
     list_per_page = 20
 
 
@@ -51,5 +55,32 @@ class OrderAdmin(NestedModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(DraggableMPTTAdmin):
-    list_display = ['indented_title', 'parent', 'name',  'image', 'is_active']
+    list_display = ['indented_title', 'parent', 'name', 'image', 'is_active']
+    list_filter = ['is_active', 'parent']
+    search_fields = ['name']
+    list_per_page = 20
+
+
+@admin.register(Wishlist)
+class WishlistAdmin(admin.ModelAdmin):
+    list_display = ['user', 'product']
+    list_per_page = 20
+
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ['first_name', 'last_name', 'phone_number', 'address']
+    list_per_page = 20
+
+
+@admin.register(ColorProduct)
+class ColorProductAdmin(admin.ModelAdmin):
+    list_display = ['color', 'product']
+    list_per_page = 20
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ['user', 'product', 'comment']
+
     list_per_page = 20
