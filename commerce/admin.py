@@ -4,18 +4,8 @@ from mptt.admin import DraggableMPTTAdmin
 from nested_inline.admin import NestedModelAdmin
 from commerce.models import *
 
-admin.site.register(Item)
-# admin.site.register(Category)
-admin.site.register(OrderStatus)
-# admin.site.register(Profile)
-admin.site.register(Images)
-# admin.site.register(Comment)
 
-
-# admin.site.register(ColorProduct)
-
-
-# admin.site.register(Wishlist)
+# admin.site.register(OrderStatus)
 
 
 class ProductImage(admin.TabularInline):
@@ -50,6 +40,7 @@ class ItemInline(admin.TabularInline):
 class OrderAdmin(NestedModelAdmin):
     inlines = [ItemInline]
     list_display = ['user', 'status', 'order_total']
+    list_filter = ['status']
     list_per_page = 20
 
 
@@ -69,18 +60,41 @@ class WishlistAdmin(admin.ModelAdmin):
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'last_name', 'phone_number', 'address']
+    list_display = ['first_name', 'last_name', 'phone_number', 'address', 'user']
+    list_filter = ['address']
     list_per_page = 20
 
 
 @admin.register(ColorProduct)
 class ColorProductAdmin(admin.ModelAdmin):
     list_display = ['color', 'product']
+    list_filter = ['color']
     list_per_page = 20
 
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     list_display = ['user', 'product', 'comment']
+    list_filter = ['product']
+    list_per_page = 20
 
+
+@admin.register(Images)
+class ImagesAdmin(admin.ModelAdmin):
+    list_display = ['product', 'image']
+    list_filter = ['product']
+    list_per_page = 20
+
+
+@admin.register(Item)
+class ItemAdmin(admin.ModelAdmin):
+    list_display = ['product', 'order', 'item_qty']
+    list_filter = ['product']
+    list_per_page = 20
+
+
+@admin.register(OrderStatus)
+class OrderStatusAdmin(admin.ModelAdmin):
+    list_display = ['title', 'is_default']
+    list_filter = ['is_default', 'title']
     list_per_page = 20
