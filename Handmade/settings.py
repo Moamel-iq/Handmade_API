@@ -65,6 +65,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'Handmade.urls'
 
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 60 * 24
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
