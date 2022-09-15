@@ -17,12 +17,12 @@ class AccountCreate(Schema):
 
 
 class AccountSignupIn(Schema):
-    first_name: str = None
-    last_name: str = None
-    email: EmailStr = None
+    first_name: str
+    last_name: str
+    email: EmailStr
     password1: str = Field(min_length=8)
     password2: str = Field(min_length=8)
-    phone_number: int = None
+    phone_number: int
 
 
 class AccountSignupOut(Schema):
