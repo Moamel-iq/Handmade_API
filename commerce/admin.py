@@ -60,8 +60,8 @@ class WishlistAdmin(admin.ModelAdmin):
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'last_name', 'phone_number', 'address', 'user']
-    list_filter = ['address']
+    list_display = ['user']
+    # list_filter = ['address']
     list_per_page = 20
 
 
@@ -98,3 +98,4 @@ class OrderStatusAdmin(admin.ModelAdmin):
     list_display = ['title', 'is_default']
     list_filter = ['is_default', 'title']
     list_per_page = 20
+

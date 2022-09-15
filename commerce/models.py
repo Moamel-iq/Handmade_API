@@ -21,14 +21,19 @@ class Entity(models.Model):
 
 class Profile(Entity):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=50, blank=True)
-    last_name = models.CharField(max_length=50, blank=True)
-    phone_number = models.CharField(max_length=15, null=True, blank=True)
-    address = models.CharField(max_length=255)
-    image = models.ImageField(default='default.jpg', upload_to='profile_pics')
+    # first_name = models.CharField(max_length=50)
+    # last_name = models.CharField(max_length=50)
+    # phone_number = models.CharField(max_length=25)
+    # address = models.CharField(max_length=255)
+    image = models.ImageField(upload_to='profile_pics', blank=True, null=True, default='default.jpg')
+    first_name = property(lambda self: self.user.first_name)
+    last_name = property(lambda self: self.user.last_name)
+    phone_number = property(lambda self: self.user.phone_number)
+    address = property(lambda self: self.user.address)
 
     def __str__(self):
         return f'{self.user.first_name}  {self.user.last_name} Profile'
+
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -158,7 +163,7 @@ class Item(Entity):
     ordered = models.BooleanField('ordered')
 
     def __str__(self):
-        return f'{self.product.name}  {self.item_qty}'
+        return f'{self.user.first_name} {self.product.name}  {self.item_qty}'
 
 
 class OrderStatus(Entity):
@@ -233,16 +238,8 @@ class Wishlist(Entity):
         verbose_name = 'wishlist'
         verbose_name_plural = 'wishlists'
 
-# class City(Entity):
-#     name = models.CharField('city', max_length=255)
-#     town = models.CharField('town', max_length=255)
-#
-#     def __str__(self):
-#         return self.name
-#
-#
-# class Town(Entity):
-#     name = models.CharField('town', max_length=255)
-#
-#     def __str__(self):
-#         return self.name
+
+class CityChoice(models.TextChoices):
+    Baghdad = 'Baghdad', 'Baghdad'
+    Basra = 'Basra', 'Basra'
+    Maysan = 'Maysan', 'Maysan'

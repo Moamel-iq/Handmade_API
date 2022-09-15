@@ -2,8 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 
 
-# create user model with first name last name phone number and email
-
 class EmailAccountManager(UserManager):
     def get_by_natural_key(self, username):
         case_insensitive_username_field = '{}__iexact'.format(self.model.USERNAME_FIELD)
