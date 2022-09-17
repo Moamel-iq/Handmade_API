@@ -2,6 +2,8 @@ from ninja import Schema
 
 from pydantic import EmailStr, Field
 
+from Handmade.utils.schemas import Token
+
 
 class MessageOut(Schema):
     message: str
@@ -26,8 +28,8 @@ class AccountSignupIn(Schema):
 
 
 class AccountSignupOut(Schema):
-    account: AccountCreate
-    token: str
+    profile: AccountCreate
+    token: Token
 
 
 class AccountLoginData(Schema):

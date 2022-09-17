@@ -6,3 +6,8 @@ class TokenAuth(Schema):
     id: str
     exp: str
     sub: str
+
+
+class Token(Schema):
+    access_token: str
+    token_type: str

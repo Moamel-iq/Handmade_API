@@ -1,4 +1,3 @@
-import uuid
 from PIL import Image
 from django.db import models
 from django.contrib.auth import get_user_model
@@ -7,25 +6,14 @@ from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 from colorfield.fields import ColorField
 
+from Handmade.utils.models import Entity
+
 User = get_user_model()
-
-
-class Entity(models.Model):
-    class Meta:
-        abstract = True
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    created = models.DateTimeField(editable=False, auto_now_add=True)
-    updated = models.DateTimeField(editable=False, auto_now=True)
 
 
 class Profile(Entity):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    # first_name = models.CharField(max_length=50)
-    # last_name = models.CharField(max_length=50)
-    # phone_number = models.CharField(max_length=25)
-    # address = models.CharField(max_length=255)
-    image = models.ImageField(upload_to='profile_pics', blank=True, null=True, default='default.jpg')
+    image = models.ImageField(upload_to='profile_pics', blank=True, null=True)
     first_name = property(lambda self: self.user.first_name)
     last_name = property(lambda self: self.user.last_name)
     phone_number = property(lambda self: self.user.phone_number)
@@ -33,7 +21,6 @@ class Profile(Entity):
 
     def __str__(self):
         return f'{self.user.first_name}  {self.user.last_name} Profile'
-
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -238,8 +225,7 @@ class Wishlist(Entity):
         verbose_name = 'wishlist'
         verbose_name_plural = 'wishlists'
 
-
-class CityChoice(models.TextChoices):
-    Baghdad = 'Baghdad', 'Baghdad'
-    Basra = 'Basra', 'Basra'
-    Maysan = 'Maysan', 'Maysan'
+# class CityChoice(models.TextChoices):
+#     Baghdad = 'Baghdad', 'Baghdad'
+#     Basra = 'Basra', 'Basra'
+#     Maysan = 'Maysan', 'Maysan'

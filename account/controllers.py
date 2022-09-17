@@ -1,15 +1,10 @@
-import profile
 from http import HTTPStatus
-
 from django.contrib.auth import get_user_model, authenticate
 from ninja import Router
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
-
-from Handmade.utils.permissions import create_token
+from Handmade.utils.permissions import *
 from Handmade.utils.utils import response
 from account.schemas import *
-
 from account.models import EmailAccount
 
 User = get_user_model()
@@ -40,16 +35,35 @@ def signup(request, account_in: AccountSignupIn):
         else:
             return response(HTTPStatus.INTERNAL_SERVER_ERROR, {'message': 'An error occurred, please try again.'})
 
-# @account_controller.post('signin', response={
-#     200: AccountSignupOut,
-#     404: MessageOut,
-# })
-# def signin(request, signin_in: AccountLoginData):
-#     user = authenticate(email=signin_in.email, password=signin_in.password)
-#     if user:
-#         token = get_tokens_for_user(user)
-#         return 200, {
-#             'token': token,
-#             'account': user
-#         }
-#     return 404, MessageOut(message='User not found')
+
+@account_controller.post('signin', response={
+    200: AccountSignupOut,
+    404: MessageOut,
+})
+def signin(request, signin_in: AccountLoginData):
+    user = authenticate(email=signin_in.email, password=signin_in.password)
+    if user is not None:
+        return response(HTTPStatus.OK, {
+            'profile': user,
+            'token': create_token(user)
+        })
+
+    return 404, MessageOut(message='User not found')
+
+# @account_controller.post('/change-password',
+#                          auth=AuthBearer(),
+#                          response={200: MessageOut, 400: MessageOut})
+# def change_password(request, change_password_in: ChangePassword):
+#     if change_password_in.new_password != change_password_in.confirm_password:
+#         return response(HTTPStatus.BAD_REQUEST, {'message': 'Passwords do not match'})
+#     try:
+#         user = get_object_or_404(EmailAccount, id=request.auth.user_id)
+#     except:
+#         return response(HTTPStatus.BAD_REQUEST, {'message': 'User not found'})
+#
+#     user_updated = user.update_password(change_password_in.old_password, change_password_in.new_password)
+#
+#     if user_updated:
+#         return response(HTTPStatus.OK, {'message': 'Password changed successfully'})
+#     else:
+#         return response(HTTPStatus.BAD_REQUEST, {'message': 'Password change failed'})

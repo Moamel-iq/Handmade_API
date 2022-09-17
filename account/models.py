@@ -36,7 +36,7 @@ class EmailAccount(AbstractUser, models.Model):
     email = models.EmailField('Email Address', unique=True)
     phone_number = models.IntegerField(null=True, blank=True)
     address = models.CharField(max_length=255, null=True, blank=True)
-
+    is_verified = models.BooleanField(default=False)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
@@ -44,3 +44,10 @@ class EmailAccount(AbstractUser, models.Model):
 
     def __str__(self):
         return self.email
+
+    def update_password(self, old_password, new_password):
+        if self.check_password(old_password):
+            self.set_password(new_password)
+            self.save()
+            return True
+        return False
