@@ -87,7 +87,7 @@ def all_orders(request, ordered: bool = False):
 #     checkout_order.save()
 #     return response(status.HTTP_200_OK, {'message': 'checkout successful'})
 #
-#
+
 # @order_controller.post('/{pk}/update_address', auth=AuthBearer(), response={200: MessageOut, 404: MessageOut})
 # def update_address(request, order_pk: UUID4, address_pk: UUID4):
 #     try:

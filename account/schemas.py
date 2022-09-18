@@ -12,7 +12,6 @@ class AccountOut(Schema):
     last_name: str = None
     phone_number: str = None
     address: str = None
-    date_joined: datetime.datetime
     is_verified: bool = None
 
 

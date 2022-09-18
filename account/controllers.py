@@ -97,5 +97,7 @@ def logout(request):
         user = get_object_or_404(EmailAccount, id=request.auth.id)
     except:
         return response(HTTPStatus.BAD_REQUEST, {'message': 'token missing'})
-    user.auth_token.delete()
-    return response(HTTPStatus.OK, {'message': 'logout successful'})
+    user.token = None
+    user.save()
+
+    return response(HTTPStatus.OK, {'message': 'logged out'})
