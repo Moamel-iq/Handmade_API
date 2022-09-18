@@ -1,0 +1,14 @@
+POST localhost:8000/maller/auth/signup
+Content-Type: application/json
+Accept: application/json
+
+{
+    "first_name": "new",
+    "last_name": "user",
+    "email":"abbas@gmail.com",
+    "password1": "aaaaaaaa",
+    "password2": "aaaaaaaa"
+
+
+}
+

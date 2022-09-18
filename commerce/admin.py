@@ -2,6 +2,8 @@ from django.contrib import admin
 from mptt.admin import DraggableMPTTAdmin
 
 from nested_inline.admin import NestedModelAdmin
+
+from account.models import Profile
 from commerce.models import *
 
 

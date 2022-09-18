@@ -5,8 +5,6 @@ from django.urls import reverse_lazy
 
 from account.models import EmailAccount
 
-FORM_CONTROL = 'form-control '
-
 
 class RegistrationForm(UserCreationForm):
     """
@@ -25,7 +23,7 @@ class RegistrationForm(UserCreationForm):
         super(RegistrationForm, self).__init__(*args, **kwargs)
         for field in (
                 self.fields['email'], self.fields['password1'], self.fields['password2']):
-            field.widget.attrs.update({'class': FORM_CONTROL})
+            field.widget.attrs.update({'class': 'form-control '})
 
 
 class AccountAuthenticationForm(forms.ModelForm):
@@ -38,8 +36,8 @@ class AccountAuthenticationForm(forms.ModelForm):
         model = EmailAccount
         fields = ('email', 'password')
         widgets = {
-            'email': forms.TextInput(attrs={'class': FORM_CONTROL}),
-            'password': forms.TextInput(attrs={'class': FORM_CONTROL}),
+            'email': forms.TextInput(attrs={'class': 'form-control'}),
+            'password': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -48,7 +46,7 @@ class AccountAuthenticationForm(forms.ModelForm):
         """
         super(AccountAuthenticationForm, self).__init__(*args, **kwargs)
         for field in (self.fields['email'], self.fields['password']):
-            field.widget.attrs.update({'class': FORM_CONTROL})
+            field.widget.attrs.update({'class': 'form-control '})
 
     def clean(self):
         if self.is_valid():
@@ -67,8 +65,8 @@ class AccountUpdateForm(forms.ModelForm):
         model = EmailAccount
         fields = ('email',)
         widgets = {
-            'email': forms.TextInput(attrs={'class': FORM_CONTROL}),
-            'password': forms.TextInput(attrs={'class': FORM_CONTROL}),
+            'email': forms.TextInput(attrs={'class': 'form-control'}),
+            'password': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -77,13 +75,13 @@ class AccountUpdateForm(forms.ModelForm):
         """
         super(AccountUpdateForm, self).__init__(*args, **kwargs)
         for field in (self.fields['email'],):
-            field.widget.attrs.update({'class': FORM_CONTROL})
+            field.widget.attrs.update({'class': 'form-control '})
 
     def clean_email(self):
         if self.is_valid():
             email = self.cleaned_data['email']
             try:
-                EmailAccount.objects.exclude(pk=self.instance.pk).get(email=email)
+                account = EmailAccount.objects.exclude(pk=self.instance.pk).get(email=email)
             except EmailAccount.DoesNotExist:
                 return email
             raise forms.ValidationError("Email '%s' already in use." % email)

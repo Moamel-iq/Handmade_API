@@ -11,28 +11,6 @@ from Handmade.utils.models import Entity
 User = get_user_model()
 
 
-class Profile(Entity):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='profile_pics', blank=True, null=True)
-    first_name = property(lambda self: self.user.first_name)
-    last_name = property(lambda self: self.user.last_name)
-    phone_number = property(lambda self: self.user.phone_number)
-    address = property(lambda self: self.user.address)
-
-    def __str__(self):
-        return f'{self.user.first_name}  {self.user.last_name} Profile'
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
-        img = Image.open(self.image.path)
-
-        if img.height > 300 or img.width > 300:
-            output_size = (300, 300)
-            img.thumbnail(output_size)
-            img.save(self.image.path)
-
-
 class Product(Entity):
     name = models.CharField('name', max_length=255)
     description = TextField('description', null=True, blank=True)
