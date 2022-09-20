@@ -203,7 +203,14 @@ class Wishlist(Entity):
         verbose_name = 'wishlist'
         verbose_name_plural = 'wishlists'
 
-# class CityChoice(models.TextChoices):
-#     Baghdad = 'Baghdad', 'Baghdad'
-#     Basra = 'Basra', 'Basra'
-#     Maysan = 'Maysan', 'Maysan'
+
+class City(Entity):
+    name = models.CharField('city', max_length=255)
+
+    class Meta:
+        verbose_name = 'city'
+        verbose_name_plural = 'cities'
+
+    def __str__(self):
+        return self.name
+

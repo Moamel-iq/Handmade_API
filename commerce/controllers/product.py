@@ -40,9 +40,9 @@ def all_products(request, category=None, search=None, per_page: int = 12, page: 
     404: MessageOut
 })
 def retrieve_product(request, pk: UUID4):
-    product_qs = Product.objects.get(id=pk)
-    if product_qs:
-        return 200, product_qs
+    product = Product.objects.get(id=pk)
+    if product:
+        return 200, product
     return 404, {'message': 'No product found'}
 
 

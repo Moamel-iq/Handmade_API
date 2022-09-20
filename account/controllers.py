@@ -89,15 +89,3 @@ def change_password(request, payload: PasswordChangeIn):
     return response(HTTPStatus.BAD_REQUEST, {'message': 'something went wrong, please try again later'})
 
 
-@auth_controller.post('/logout',
-                      auth=AuthBearer(),
-                      response={200: MessageOut, 400: MessageOut})
-def logout(request):
-    try:
-        user = get_object_or_404(EmailAccount, id=request.auth.id)
-    except:
-        return response(HTTPStatus.BAD_REQUEST, {'message': 'token missing'})
-    user.token = None
-    user.save()
-
-    return response(HTTPStatus.OK, {'message': 'logged out'})

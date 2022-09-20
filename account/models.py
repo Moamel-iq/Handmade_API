@@ -39,6 +39,7 @@ class EmailAccount(AbstractUser, models.Model):
     email = models.EmailField('Email Address', unique=True)
     phone_number = models.IntegerField(null=True, blank=True)
     address = models.CharField(max_length=255, null=True, blank=True)
+
     is_verified = models.BooleanField(default=False)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -59,10 +60,10 @@ class EmailAccount(AbstractUser, models.Model):
 class Profile(Entity):
     user = models.OneToOneField(EmailAccount, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='profile_pics', blank=True, null=True)
-    first_name = property(lambda self: self.user.first_name)
-    last_name = property(lambda self: self.user.last_name)
-    phone_number = property(lambda self: self.user.phone_number)
-    address = property(lambda self: self.user.address)
+    first_name = models.CharField(max_length=255, null=True, blank=True)
+    last_name = models.CharField(max_length=255, null=True, blank=True)
+    phone_number = models.IntegerField(null=True, blank=True)
+    address = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return f'{self.user.first_name}  {self.user.last_name} Profile'
@@ -70,9 +71,3 @@ class Profile(Entity):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        img = Image.open(self.image.path)
-
-        if img.height > 300 or img.width > 300:
-            output_size = (300, 300)
-            img.thumbnail(output_size)
-            img.save(self.image.path)

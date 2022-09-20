@@ -39,8 +39,9 @@ class ProductImageOut(Schema):
     image: str
 
 
-class ImageEdit(Schema):
-    is_default_image: bool
+#
+# class ImageEdit(Schema):
+#     is_default_image: bool
 
 
 class ProductOut(Schema):
@@ -79,6 +80,7 @@ class ProductCreate(Schema):
 
 
 class ItemOut(Schema):
+    id: UUID4
     product: ProductOut
     item_qty: int
     ordered: bool
@@ -113,24 +115,23 @@ class CityCreate(Schema):
     name: str
 
 
-# class AddressOut(ModelSchema):
-#     user: AccountOut
-#     city: CityOut
+class AddressOut(ModelSchema):
+    user: AccountOut
+    city: CityOut
 
-# class Handmade:
-#     model = Address
-#     model_fields = [
-#         'id',
-#         'address',
-#         'phone'
-#     ]
+    class Config:
+        model = Address
+        model_fields = [
+            'id',
+            'address',
+            'phone'
+        ]
 
 
 class AddressCreate(Schema):
-    user_id: UUID4
-    city_id: UUID4
     address: str
-    phone: str
+    city_id: UUID4
+    phone: int
 
 
 class CommentOut(Schema):

@@ -34,12 +34,18 @@ class AccountConfirmationIn(Schema):
     verification_code: str
 
 
+class ImageCreate(Schema):
+    product_id: UUID4
+    is_default_image: bool
+
+
 class AccountUpdateIn(Schema):
     first_name: str = None
     last_name: str = None
-    email: str = None
+    email: str
     phone_number: str = None
     address: str = None
+    image : ImageCreate = None
 
 
 class AccountSigninOut(Schema):
