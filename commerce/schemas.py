@@ -49,7 +49,9 @@ class ProductOut(Schema):
     name: str
     description: str = None
     in_stock: bool = None
-    qty: int = None
+    qty: int
+    price: float
+    new_price: float = None
     category: CategoryData = None
     is_featured: bool = None
     is_active: bool = None

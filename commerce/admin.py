@@ -16,15 +16,15 @@ class ProductImage(admin.TabularInline):
     extra = 1
 
 
-class ProductColor(admin.TabularInline):
-    model = ColorProduct
-    inlines = []
-    extra = 1
+# class ProductColor(admin.TabularInline):
+#     model = ColorProduct
+#     inlines = []
+#     extra = 1
 
 
 @admin.register(Product)
 class ProductAdmin(NestedModelAdmin):
-    inlines = [ProductColor, ProductImage]
+    inlines = [ ProductImage]
 
     list_display = ['name', 'price', 'category', 'is_active', 'qty']
     list_filter = ['is_active', 'category']
@@ -67,11 +67,11 @@ class ProfileAdmin(admin.ModelAdmin):
     list_per_page = 20
 
 
-@admin.register(ColorProduct)
-class ColorProductAdmin(admin.ModelAdmin):
-    list_display = ['color', 'product']
-    list_filter = ['color']
-    list_per_page = 20
+# @admin.register(ColorProduct)
+# class ColorProductAdmin(admin.ModelAdmin):
+#     list_display = ['color', 'product']
+#     list_filter = ['color']
+#     list_per_page = 20
 
 
 @admin.register(Comment)

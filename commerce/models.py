@@ -16,6 +16,7 @@ class Product(Entity):
     description = TextField('description', null=True, blank=True)
     qty = models.IntegerField('qty', default=1)
     price = models.DecimalField('price', max_digits=10, decimal_places=2)
+    new_price = models.DecimalField('new_price', max_digits=10, decimal_places=2, null=True, blank=True)
     discounted_price = models.FloatField('discounted price', null=True, blank=True)
     category = models.ForeignKey('commerce.Category', verbose_name='category', related_name='products', null=True,
                                  blank=True, on_delete=models.SET_NULL)
