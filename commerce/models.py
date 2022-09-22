@@ -17,7 +17,6 @@ class Product(Entity):
     qty = models.IntegerField('qty', default=1)
     price = models.DecimalField('price', max_digits=10, decimal_places=2)
     new_price = models.DecimalField('new_price', max_digits=10, decimal_places=2, null=True, blank=True)
-    discounted_price = models.FloatField('discounted price', null=True, blank=True)
     category = models.ForeignKey('commerce.Category', verbose_name='category', related_name='products', null=True,
                                  blank=True, on_delete=models.SET_NULL)
 
@@ -97,8 +96,7 @@ class Category(MPTTModel, Entity):
 class Order(Entity):
     user = models.ForeignKey(User, verbose_name='user', related_name='orders', null=True, blank=True,
                              on_delete=models.CASCADE)
-    address = models.ForeignKey('Address', verbose_name='address', null=True, blank=True,
-                                on_delete=models.CASCADE)
+    address = models.CharField('address', max_length=255)
     status = models.ForeignKey('commerce.OrderStatus', verbose_name='status', related_name='orders',
                                on_delete=models.CASCADE)
     note = models.CharField('note', null=True, blank=True, max_length=255)
@@ -174,23 +172,14 @@ class Images(Entity):
             img.save(self.image.path)
 
 
-class Address(Entity):
-    user = models.ForeignKey(User, verbose_name='user', related_name='addresses',
-                             on_delete=models.CASCADE)
-    address = models.CharField('address1', max_length=255)
-    phone = models.CharField('phone', max_length=255)
-
-    def __str__(self):
-        return f'{self.user.first_name} - {self.address} - {self.phone}'
-
-
-class Comment(Entity):
-    user = models.ForeignKey(User, verbose_name='user', related_name='comments', on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, verbose_name='product', related_name='comments', on_delete=models.CASCADE)
-    comment = models.TextField('comment')
-
-    def __str__(self):
-        return f'{self.user.first_name} - {self.product.name} comment'
+# class Address(Entity):
+#     user = models.ForeignKey(User, verbose_name='user', related_name='addresses',
+#                              on_delete=models.CASCADE)
+#     address = models.CharField('address1', max_length=255)
+#     phone = models.CharField('phone', max_length=255)
+#
+#     def __str__(self):
+#         return f'{self.user.first_name} - {self.address} '
 
 
 class Wishlist(Entity):
@@ -204,14 +193,10 @@ class Wishlist(Entity):
         verbose_name = 'wishlist'
         verbose_name_plural = 'wishlists'
 
-
-class City(Entity):
-    name = models.CharField('city', max_length=255)
-
-    class Meta:
-        verbose_name = 'city'
-        verbose_name_plural = 'cities'
-
-    def __str__(self):
-        return self.name
-
+# class Comment(Entity):
+#     user = models.ForeignKey(User, verbose_name='user', related_name='comments', on_delete=models.CASCADE)
+#     product = models.ForeignKey(Product, verbose_name='product', related_name='comments', on_delete=models.CASCADE)
+#     comment = models.TextField('comment')
+#
+#     def __str__(self):
+#         return f'{self.user.first_name} - {self.product.name} comment'

@@ -16,15 +16,15 @@ class ProductImage(admin.TabularInline):
     extra = 1
 
 
-# class ProductColor(admin.TabularInline):
-#     model = ColorProduct
-#     inlines = []
-#     extra = 1
+class ProductColor(admin.TabularInline):
+    model = ColorProduct
+    inlines = []
+    extra = 1
 
 
 @admin.register(Product)
 class ProductAdmin(NestedModelAdmin):
-    inlines = [ ProductImage]
+    inlines = [ProductColor, ProductImage]
 
     list_display = ['name', 'price', 'category', 'is_active', 'qty']
     list_filter = ['is_active', 'category']
@@ -63,22 +63,22 @@ class WishlistAdmin(admin.ModelAdmin):
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ['user']
-    # list_filter = ['address']
+    list_filter = ['address']
     list_per_page = 20
 
 
-# @admin.register(ColorProduct)
-# class ColorProductAdmin(admin.ModelAdmin):
-#     list_display = ['color', 'product']
-#     list_filter = ['color']
+@admin.register(ColorProduct)
+class ColorProductAdmin(admin.ModelAdmin):
+    list_display = ['color', 'product']
+    list_filter = ['color']
+    list_per_page = 20
+
+
+# @admin.register(Comment)
+# class CommentAdmin(admin.ModelAdmin):
+#     list_display = ['user', 'product', 'comment']
+#     list_filter = ['product']
 #     list_per_page = 20
-
-
-@admin.register(Comment)
-class CommentAdmin(admin.ModelAdmin):
-    list_display = ['user', 'product', 'comment']
-    list_filter = ['product']
-    list_per_page = 20
 
 
 @admin.register(Images)
@@ -100,4 +100,13 @@ class OrderStatusAdmin(admin.ModelAdmin):
     list_display = ['title', 'is_default']
     list_filter = ['is_default', 'title']
     list_per_page = 20
+
+
+# @admin.register(Address)
+# class AddressAdmin(admin.ModelAdmin):
+#     list_display = ['user', 'address']
+#     list_per_page = 20
+
+
+
 

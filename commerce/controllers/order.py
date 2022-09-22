@@ -5,7 +5,7 @@ from Handmade.utils import status
 from Handmade.utils.permissions import AuthBearer
 from Handmade.utils.schemas import MessageOut
 from Handmade.utils.utils import response
-from commerce.models import Order, OrderStatus, Item, Address
+from commerce.models import Order, OrderStatus, Item
 from commerce.schemas import *
 
 User = get_user_model()
@@ -58,49 +58,27 @@ def create_update(request, items_in: OrderIn):
         order_.save()
         return response(status.HTTP_200_OK, {"message": "order created successfully"})
 
-#
-@order_controller.post('/checkout', auth=AuthBearer(), response={
+
+@order_controller.delete('/{order_id}', auth=AuthBearer(), response={
     200: MessageOut,
-    404: MessageOut,
-    400: MessageOut
+    404: MessageOut
 })
-def checkout(request):
-    try:
-        checkout_order = Order.objects.get(ordered=False, user=request.auth)
-    except Order.DoesNotExist:
-        return response(status.HTTP_404_NOT_FOUND, {'message': 'Order not found'})
-    address = Address.objects.get(user=request.auth)
-    checkout_order.address = address
-    if not checkout_order.address:
-        return response(status.HTTP_400_BAD_REQUEST, {'message': 'order should have an address assigned'})
-
-    checkout_order.shipping = checkout_order.order_shipment
-    checkout_order.total = checkout_order.order_total
-    for i in checkout_order.items.all():
-        if i.product.qty < i.item_qty:
-            return response(status.HTTP_404_NOT_FOUND, {
-                'message': f'item {i.product.name} is out of stock!'
-            })
-        i.product.qty -= i.item_qty
-        i.product.save()
-    checkout_order.ordered = True
-    checkout_order.save()
-    return response(status.HTTP_200_OK, {'message': 'checkout successful'})
+def delete_order(request, order_id: int):
+    order = Order.objects.filter(id=order_id, user=request.auth)
+    if not order:
+        return response(status.HTTP_404_NOT_FOUND, {'message': 'No order found'})
+    order.delete()
+    return response(status.HTTP_200_OK, {'message': 'Order deleted successfully'})
 
 
-# @order_controller.post('/{pk}/update_address', auth=AuthBearer(), response={200: MessageOut, 404: MessageOut})
-# def update_address(request, order_pk: UUID4, address_pk: UUID4):
-#     try:
-#         address = Address.objects.get(pk=address_pk, user=request.auth)
-#     except Address.DoesNotExist:
-#         return response(status.HTTP_404_NOT_FOUND, {'message': 'Address does not exist'})
-#
-#     try:
-#         order_qs = Order.objects.get(pk=order_pk, user=request.auth)
-#     except Order.DoesNotExist:
-#         return response(status.HTTP_404_NOT_FOUND, {'message': 'Order does not exist'})
-#
-#     order_qs.address = address
-#     order_qs.save()
-#
-#     return response(status.HTTP_200_OK, {'message': 'address updated successfully'})
+@order_controller.post('/{order_id}/checkout', auth=AuthBearer(), response={
+    200: MessageOut,
+    404: MessageOut
+})
+def checkout_order(request, order_id: str):
+    order = Order.objects.filter(id=order_id, user=request.auth)
+    if not order:
+        return response(status.HTTP_404_NOT_FOUND, {'message': 'No order found'})
+    order.update(ordered=True)
+    return response(status.HTTP_200_OK, {'message': 'Order checked out successfully'})
+

@@ -71,5 +71,4 @@ class Profile(Schema):
     last_name: str
     phone_number: str
     address: str
-    city: str
-    is_verified: bool
+
