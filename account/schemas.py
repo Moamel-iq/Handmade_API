@@ -19,7 +19,6 @@ class AccountSignupIn(Schema):
     first_name: str
     last_name: str
     email: EmailStr
-    phone: int
     password1: str
     password2: str
 
@@ -45,7 +44,7 @@ class AccountUpdateIn(Schema):
     email: str
     phone_number: str = None
     address: str = None
-    image : ImageCreate = None
+    image: ImageCreate = None
 
 
 class AccountSigninOut(Schema):
@@ -71,4 +70,3 @@ class Profile(Schema):
     last_name: str
     phone_number: str
     address: str
-

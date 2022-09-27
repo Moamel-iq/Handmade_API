@@ -25,8 +25,8 @@ def all_products(request, category=None, search=None, per_page: int = 12, page: 
         products = Product.objects.filter(category__name=category)
     elif search:
         products = Product.objects.filter(
-            Q(name__icontains=search) |
-            Q(description__icontains=search)
+            Q(name__icontains=search)
+
         )
     else:
         products = Product.objects.all()

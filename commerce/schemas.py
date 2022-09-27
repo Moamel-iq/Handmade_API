@@ -101,3 +101,12 @@ class OrderOut(Schema):
 
 class OrderIn(Schema):
     items: List[UUID4]
+
+
+class WishListOut(Schema):
+    id: UUID4
+    product: ProductOut
+
+
+class WishListIn(Schema):
+    product_id: UUID4

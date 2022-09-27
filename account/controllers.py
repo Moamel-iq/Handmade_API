@@ -45,10 +45,10 @@ def login(request, payload: AccountSigninIn):
     return response(HTTPStatus.NOT_FOUND, {'message': 'User not found'})
 
 
-@auth_controller.get('/me',
+@auth_controller.get('/profile',
                      auth=AuthBearer(),
                      response={200: AccountOut, 400: MessageOut})
-def me(request):
+def profile(request):
     try:
         user = get_object_or_404(EmailAccount, id=request.auth.id)
     except:
@@ -56,10 +56,10 @@ def me(request):
     return response(HTTPStatus.OK, user)
 
 
-@auth_controller.put('/me',
+@auth_controller.put('/profile',
                      auth=AuthBearer(),
                      response={200: AccountOut, 400: MessageOut})
-def update_me(request, user_in: AccountUpdateIn):
+def update_profile(request, user_in: AccountUpdateIn):
     EmailAccount.objects.filter(id=request.auth.id).update(**user_in.dict())
     user = get_object_or_404(EmailAccount, id=request.auth.id)
     if not user:

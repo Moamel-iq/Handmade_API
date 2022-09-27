@@ -99,8 +99,6 @@ class Order(Entity):
     address = models.CharField('address', max_length=255)
     status = models.ForeignKey('commerce.OrderStatus', verbose_name='status', related_name='orders',
                                on_delete=models.CASCADE)
-    note = models.CharField('note', null=True, blank=True, max_length=255)
-    ref_code = models.CharField('ref code', max_length=255, null=True, blank=True)
     ordered = models.BooleanField('ordered')
     items = models.ManyToManyField('commerce.Item', verbose_name='items', related_name='order')
 
