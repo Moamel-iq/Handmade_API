@@ -23,7 +23,8 @@ def register(request, payload: AccountSignupIn):
                         {'message': 'Forbidden, email is already registered'})
     except EmailAccount.DoesNotExist:
         user = EmailAccount.objects.create_user(first_name=payload.first_name, last_name=payload.last_name,
-                                                email=payload.email, password=payload.password1)
+                                                email=payload.email, password=payload.password1,
+                                                phone_number=payload.phone_number, address=payload.address)
         if user:
             token = create_token(user.id)
             return response(HTTPStatus.OK, {

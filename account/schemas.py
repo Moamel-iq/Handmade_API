@@ -8,11 +8,10 @@ from Handmade.utils.schemas import Token
 
 class AccountOut(Schema):
     email: EmailStr
-    first_name: str = None
-    last_name: str = None
-    phone_number: str = None
+    first_name: str
+    last_name: str
+    phone_number: int
     address: str = None
-    is_verified: bool = None
 
 
 class AccountSignupIn(Schema):
@@ -21,6 +20,8 @@ class AccountSignupIn(Schema):
     email: EmailStr
     password1: str
     password2: str
+    phone_number: int
+    address: str = None
 
 
 class AccountSignupOut(Schema):

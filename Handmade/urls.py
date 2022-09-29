@@ -1,13 +1,15 @@
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from ninja import NinjaAPI
+
+from Handmade import settings
 from account.controllers import auth_controller
 from commerce.controllers.cart import cart_controller
 from commerce.controllers.order import order_controller
 from commerce.controllers.others import category_controller, product_image_controller, item_controller, wishlist_controller
 from commerce.controllers.product import product_controller
 
-# from commerce.controllers.address import address_controller
 
 api = NinjaAPI()
 api.add_router('/auth', auth_controller)
@@ -24,4 +26,5 @@ urlpatterns = [
     path('api/', api.urls),
 ]
 
-# urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
