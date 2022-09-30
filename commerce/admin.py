@@ -3,7 +3,7 @@ from mptt.admin import DraggableMPTTAdmin
 
 from nested_inline.admin import NestedModelAdmin
 
-from account.models import Profile
+
 from commerce.models import *
 
 
@@ -60,11 +60,6 @@ class WishlistAdmin(admin.ModelAdmin):
     list_per_page = 20
 
 
-@admin.register(Profile)
-class ProfileAdmin(admin.ModelAdmin):
-    list_display = ['user']
-    list_filter = ['address']
-    list_per_page = 20
 
 
 @admin.register(ColorProduct)

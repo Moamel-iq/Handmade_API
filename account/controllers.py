@@ -1,12 +1,13 @@
-from ninja import Router
+from ninja import Router, File
 from http import HTTPStatus
 from django.contrib.auth import authenticate
 from Handmade.utils.permissions import create_token, AuthBearer
 from Handmade.utils.schemas import MessageOut
 from Handmade.utils.utils import response
+from ninja.files import UploadedFile
 from .models import EmailAccount
 from .schemas import AccountSignupOut, AccountSignupIn, AccountSigninOut, \
-    AccountSigninIn, AccountOut, AccountUpdateIn, PasswordChangeIn
+    AccountSigninIn, AccountOut, AccountUpdateIn, PasswordChangeIn, Profile
 from django.shortcuts import get_object_or_404
 
 auth_controller = Router(tags=['Auth'])
@@ -24,8 +25,12 @@ def register(request, payload: AccountSignupIn):
     except EmailAccount.DoesNotExist:
         user = EmailAccount.objects.create_user(first_name=payload.first_name, last_name=payload.last_name,
                                                 email=payload.email, password=payload.password1,
-                                                phone_number=payload.phone_number, address=payload.address)
+                                                 )
+
         if user:
+            user.phone_number = payload.phone_number
+            user.address = payload.address
+            user.save()
             token = create_token(user.id)
             return response(HTTPStatus.OK, {
                 'profile': user,
@@ -44,28 +49,6 @@ def login(request, payload: AccountSigninIn):
             'token': create_token(user.id)
         })
     return response(HTTPStatus.NOT_FOUND, {'message': 'User not found'})
-
-
-@auth_controller.get('/profile',
-                     auth=AuthBearer(),
-                     response={200: AccountOut, 400: MessageOut})
-def profile(request):
-    try:
-        user = get_object_or_404(EmailAccount, id=request.auth.id)
-    except:
-        return response(HTTPStatus.BAD_REQUEST, {'message': 'token missing'})
-    return response(HTTPStatus.OK, user)
-
-
-@auth_controller.put('/profile',
-                     auth=AuthBearer(),
-                     response={200: AccountOut, 400: MessageOut})
-def update_profile(request, user_in: AccountUpdateIn):
-    EmailAccount.objects.filter(id=request.auth.id).update(**user_in.dict())
-    user = get_object_or_404(EmailAccount, id=request.auth.id)
-    if not user:
-        return response(HTTPStatus.BAD_REQUEST, data={'message': 'something went wrong'})
-    return response(HTTPStatus.OK, user)
 
 
 @auth_controller.post('/change-password',
@@ -90,3 +73,23 @@ def change_password(request, payload: PasswordChangeIn):
     return response(HTTPStatus.BAD_REQUEST, {'message': 'something went wrong, please try again later'})
 
 
+@auth_controller.get('/profile',
+                     auth=AuthBearer(),
+                     response={200: AccountOut, 400: MessageOut})
+def profile(request):
+    try:
+        user = get_object_or_404(EmailAccount, id=request.auth.id)
+    except:
+        return response(HTTPStatus.BAD_REQUEST, {'message': 'token missing'})
+    return response(HTTPStatus.OK, user)
+
+
+@auth_controller.put('/profile',
+                     auth=AuthBearer(),
+                     response={200: AccountOut, 400: MessageOut})
+def update_profile(request, user_in: AccountUpdateIn):
+    EmailAccount.objects.filter(id=request.auth.id).update(**user_in.dict())
+    user = get_object_or_404(EmailAccount, id=request.auth.id)
+    if not user:
+        return response(HTTPStatus.BAD_REQUEST, data={'message': 'something went wrong'})
+    return response(HTTPStatus.OK, user)

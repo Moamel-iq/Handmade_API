@@ -10,7 +10,7 @@ class AccountOut(Schema):
     email: EmailStr
     first_name: str
     last_name: str
-    phone_number: int
+    phone_number: str = None
     address: str = None
 
 
@@ -20,7 +20,7 @@ class AccountSignupIn(Schema):
     email: EmailStr
     password1: str
     password2: str
-    phone_number: int
+    phone_number: str = None
     address: str = None
 
 
@@ -45,7 +45,7 @@ class AccountUpdateIn(Schema):
     email: str
     phone_number: str = None
     address: str = None
-    image: ImageCreate = None
+
 
 
 class AccountSigninOut(Schema):
@@ -67,7 +67,3 @@ class PasswordChangeIn(Schema):
 class Profile(Schema):
     id: UUID4
     account: AccountOut
-    first_name: str
-    last_name: str
-    phone_number: str
-    address: str
