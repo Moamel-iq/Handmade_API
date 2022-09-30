@@ -1,9 +1,10 @@
+from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from ninja import NinjaAPI
 
-from Handmade import settings
+
 from account.controllers import auth_controller
 from commerce.controllers.cart import cart_controller
 from commerce.controllers.order import order_controller

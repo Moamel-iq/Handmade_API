@@ -89,7 +89,8 @@ def profile(request):
                      response={200: AccountOut, 400: MessageOut})
 def update_profile(request, user_in: AccountUpdateIn):
     try:
-        user = get_object_or_404(EmailAccount, id=request.auth.id)
+        user = EmailAccount.objects.filter(id=request.auth.id)
+
     except:
         return response(HTTPStatus.BAD_REQUEST, {'message': 'token missing'})
 
@@ -106,3 +107,6 @@ def update_profile(request, user_in: AccountUpdateIn):
 
     user.save()
     return response(HTTPStatus.OK, user)
+
+
+
