@@ -42,7 +42,7 @@ class EmailAccount(AbstractUser):
     email = models.EmailField('Email Address', unique=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     address = models.CharField(max_length=255, blank=True, null=True)
-
+    image = models.ImageField(default='default.png', upload_to='profile_pics', blank=True, null=True)
     is_verified = models.BooleanField(default=False)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -63,7 +63,7 @@ class EmailAccount(AbstractUser):
 class Profile(Entity):
     id = models.AutoField(primary_key=True)
     user = models.OneToOneField(EmailAccount, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='profile_pics', default='default.jpg')
+    image = models.ImageField(upload_to='profile_pics', default='default.png')
 
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}{self.user.email}{self.user.phone_number}{self.user.address}'
@@ -87,8 +87,8 @@ class Profile(Entity):
     def address(self):
         return self.user.address
 
+
 @receiver(post_save, sender=EmailAccount)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
-

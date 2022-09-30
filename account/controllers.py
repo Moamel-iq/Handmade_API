@@ -25,8 +25,8 @@ def register(request, payload: AccountSignupIn):
     except EmailAccount.DoesNotExist:
         user = EmailAccount.objects.create_user(first_name=payload.first_name, last_name=payload.last_name,
                                                 email=payload.email, password=payload.password1,
-                                                 )
 
+                                                )
         if user:
             user.phone_number = payload.phone_number
             user.address = payload.address
@@ -88,8 +88,21 @@ def profile(request):
                      auth=AuthBearer(),
                      response={200: AccountOut, 400: MessageOut})
 def update_profile(request, user_in: AccountUpdateIn):
-    EmailAccount.objects.filter(id=request.auth.id).update(**user_in.dict())
-    user = get_object_or_404(EmailAccount, id=request.auth.id)
-    if not user:
-        return response(HTTPStatus.BAD_REQUEST, data={'message': 'something went wrong'})
+    try:
+        user = get_object_or_404(EmailAccount, id=request.auth.id)
+    except:
+        return response(HTTPStatus.BAD_REQUEST, {'message': 'token missing'})
+
+    if user_in.first_name:
+        user.first_name = user_in.first_name
+    if user_in.last_name:
+        user.last_name = user_in.last_name
+    if user_in.email:
+        user.email = user_in.email
+    if user_in.phone_number:
+        user.phone_number = user_in.phone_number
+    if user_in.address:
+        user.address = user_in.address
+
+    user.save()
     return response(HTTPStatus.OK, user)

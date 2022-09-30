@@ -12,6 +12,7 @@ class AccountOut(Schema):
     last_name: str
     phone_number: str = None
     address: str = None
+    image: str = None
 
 
 class AccountSignupIn(Schema):
@@ -42,10 +43,9 @@ class ImageCreate(Schema):
 class AccountUpdateIn(Schema):
     first_name: str = None
     last_name: str = None
-    email: str
+    email: str = None
     phone_number: str = None
     address: str = None
-
 
 
 class AccountSigninOut(Schema):
